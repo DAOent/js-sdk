@@ -1,22 +1,20 @@
-import "@babel/polyfill";
 import { WsProvider, ApiPromise } from "@polkadot/api";
-import { subscribeMessage, getNetworkConst, getNetworkProperties } from "./service/setting";
-import keyring from "./service/keyring";
-import account from "./service/account";
-import staking from "./service/staking";
-import gov from "./service/gov";
+import { subscribeMessage, getNetworkConst, getNetworkProperties } from "./hander/setting";
+import keyring from "./hander/keyring";
+import account from "./hander/account";
 import { genLinks } from "./utils/config/config";
 
-// send message to JSChannel: PolkaWallet
+
+// console.log will send message to MsgChannel to App
 function send(path: string, data: any) {
-  if (window.location.href === "about:blank") {
-    PolkaWallet.postMessage(JSON.stringify({ path, data }));
-  } else {
-    console.log(path, data);
-  }
+  console.log(JSON.stringify({ path, data }));
 }
 send("log", "main js loaded");
 (<any>window).send = send;
+
+async function connectAll(nodes: string[]) {
+  return Promise.race(nodes.map((node) => connect([node])));
+}
 
 /**
  * connect to a specific node.
@@ -24,16 +22,26 @@ send("log", "main js loaded");
  * @param {string} nodeEndpoint
  */
 async function connect(nodes: string[]) {
+  (<any>window).api = undefined;
+
   return new Promise(async (resolve, reject) => {
     const wsProvider = new WsProvider(nodes);
     try {
       const res = await ApiPromise.create({
         provider: wsProvider,
       });
-      (<any>window).api = res;
-      const url = nodes[(<any>res)._options.provider.__private_15_endpointIndex];
-      send("log", `${url} wss connected success`);
-      resolve(url);
+      if (!(<any>window).api) {
+        (<any>window).api = res;
+        // console.log(res);
+        const url = (<any>res)._options.provider.__internal__endpoints[0];
+        send("log", `${url} wss connected success`);
+        resolve(url);
+      } else {
+        res.disconnect();
+        const url = (<any>res)._options.provider.__internal__endpoints[0];
+        send("log", `${url} wss success and disconnected`);
+        resolve(url);
+      }
     } catch (err) {
       send("log", `connect failed`);
       wsProvider.disconnect();
@@ -50,6 +58,7 @@ const test = async () => {
 const settings = {
   test,
   connect,
+  connectAll,
   subscribeMessage,
   getNetworkConst,
   getNetworkProperties,
@@ -60,7 +69,5 @@ const settings = {
 (<any>window).settings = settings;
 (<any>window).keyring = keyring;
 (<any>window).account = account;
-(<any>window).staking = staking;
-(<any>window).gov = gov;
 
 export default settings;
