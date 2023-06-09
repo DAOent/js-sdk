@@ -3,7 +3,7 @@ const webpack = require("webpack");
 
 const config = {
   entry: {
-    index: "./src/index.ts",
+    flutter_bridge: "./src/flutter.ts",
   },
   output: {
     publicPath: path.resolve(__dirname, ""),

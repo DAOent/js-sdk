@@ -1,14 +1,16 @@
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { hexToU8a, u8aToHex, hexToString } from "@polkadot/util";
+import { hexToU8a, u8aToHex, hexToString, u8aWrapBytes } from "@polkadot/util";
 // @ts-ignore
 import { ss58Decode } from "oo7-substrate/src/ss58";
 import { polkadotIcon } from "@polkadot/ui-shared";
 
-import { Keyring } from "@polkadot/keyring";
 import { ApiPromise } from "@polkadot/api";
 
 import { subscribeMessage } from "./setting";
-let keyring = new Keyring({ ss58Format: 0, type: "sr25519" });
+import { web3Accounts, web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
+import keyring from "./keyring";
+import { hexToss58 } from "../utils/address";
+// let keyring = new Keyring({ ss58Format: 0, type: "sr25519" });
 
 /**
  * Get svg icons of addresses.
@@ -26,7 +28,7 @@ async function genIcons(addresses: string[]) {
  * Get svg icons of pubKeys.
  */
 async function genPubKeyIcons(pubKeys: string[]) {
-  const icons = await genIcons(pubKeys.map((key) => keyring.encodeAddress(hexToU8a(key), 2)));
+  const icons = await genIcons(pubKeys.map((key) => keyring.globlekeyring.encodeAddress(hexToU8a(key), 2)));
   return icons.map((i, index) => {
     i[0] = pubKeys[index];
     return i;
@@ -41,11 +43,11 @@ async function decodeAddress(addresses: string[]) {
   try {
     const res = {};
     addresses.forEach((i) => {
-      const pubKey = u8aToHex(keyring.decodeAddress(i));
+      const pubKey = u8aToHex(keyring.globlekeyring.decodeAddress(i));
       (<any>res)[pubKey] = i;
     });
     return res;
-  } catch (err:any) {
+  } catch (err: any) {
     (<any>window).send("log", { error: err.message });
     return null;
   }
@@ -57,9 +59,9 @@ async function decodeAddress(addresses: string[]) {
 async function checkAddressFormat(address: string, ss58: number) {
   await cryptoWaitReady();
   try {
-    const formated = keyring.encodeAddress(keyring.decodeAddress(address), ss58);
+    const formated = keyring.globlekeyring.encodeAddress(keyring.globlekeyring.decodeAddress(address), ss58);
     return formated.toUpperCase() == address.toUpperCase();
-  } catch (err:any) {
+  } catch (err: any) {
     (<any>window).send("log", { error: err.message });
     return false;
   }
@@ -74,7 +76,7 @@ async function encodeAddress(pubKeys: string[], ss58Formats: number[]) {
   ss58Formats.forEach((ss58) => {
     (<any>res)[ss58] = {};
     pubKeys.forEach((i) => {
-      (<any>res)[ss58][i] = keyring.encodeAddress(hexToU8a(i), ss58);
+      (<any>res)[ss58][i] = keyring.globlekeyring.encodeAddress(hexToU8a(i), ss58);
     });
   });
   return res;
@@ -95,9 +97,9 @@ async function queryAddressWithAccountIndex(api: ApiPromise, accIndex: string, s
 async function queryAccountsBonded(api: ApiPromise, pubKeys: string[]) {
   return Promise.all(
     pubKeys
-      .map((key) => keyring.encodeAddress(hexToU8a(key), 2))
+      .map((key) => keyring.globlekeyring.encodeAddress(hexToU8a(key), 2))
       .map((i) => Promise.all([api.query.staking.bonded(i), api.query.staking.ledger(i)]))
-  ).then((ls) => ls.map((i:any[], index) => [pubKeys[index], i[0], i[1].toHuman() ? i[1].toHuman()["stash"] : null]));
+  ).then((ls) => ls.map((i: any[], index) => [pubKeys[index], i[0], i[1].toHuman() ? i[1].toHuman()["stash"] : null]));
 }
 
 /**
@@ -134,14 +136,49 @@ async function getAccountIndex(api: ApiPromise, addresses: string[]) {
   });
 }
 
+export async function queryAccounts() {
+  const extensions = await web3Enable('DTIM');
+  if (extensions.length === 0) {
+    throw new Error('no extension');
+  }
+
+  const allAccounts = await web3Accounts();
+  return allAccounts.map(v => {
+    v.address = u8aToHex(keyring.globlekeyring.decodeAddress(v.address));
+    return v;
+  });
+}
+
+export async function sign(address: string, ctx: string): Promise<string> {
+  const extensions = await web3Enable('DTIM');
+  if (extensions.length === 0) {
+    throw new Error('no extension');
+  }
+  const SENDER = hexToss58(address);
+  const injector = await web3FromAddress(SENDER);
+
+  const signRaw = injector.signer.signRaw;
+  if (signRaw == null) {
+    throw new Error('no signRaw');
+  }
+
+  const wrapped = u8aWrapBytes(ctx)
+  const { signature } = await signRaw({
+    address: SENDER,
+    data: u8aToHex(wrapped),
+    type: 'bytes'
+  });
+  return signature;
+}
+
 export default {
-  encodeAddress,
-  decodeAddress,
-  checkAddressFormat,
-  queryAddressWithAccountIndex,
+  // encodeAddress,
+  // decodeAddress,
+  // checkAddressFormat,
+  // queryAddressWithAccountIndex,
   genIcons,
-  genPubKeyIcons,
-  queryAccountsBonded,
-  getBalance,
-  getAccountIndex,
+  // genPubKeyIcons,
+  // queryAccountsBonded,
+  // getBalance,
+  // getAccountIndex,
 };

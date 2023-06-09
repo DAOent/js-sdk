@@ -10,7 +10,7 @@
     "clean": "rm -f dist/*",
     "prebuild": "rm -f ./assets/*.js",
     "build": "yarn prebuild && yarn clean && webpack --mode production",
-    "build-dev": "webpack --mode development"
+    "build-dev": "webpack --watch --mode development"
   },
   "resolutions": {
     "@acala-network/eth-providers": "^2.6.5",

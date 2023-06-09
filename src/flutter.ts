@@ -1,7 +1,7 @@
 import { WsProvider, ApiPromise } from "@polkadot/api";
 import { subscribeMessage, getNetworkConst, getNetworkProperties } from "./hander/setting";
 import keyring from "./hander/keyring";
-import account from "./hander/account";
+import account, { queryAccounts, sign } from "./hander/account";
 import { genLinks } from "./utils/config/config";
 
 
@@ -62,12 +62,12 @@ const settings = {
   subscribeMessage,
   getNetworkConst,
   getNetworkProperties,
-  // generate external links to polkascan/subscan/polkassembly...
-  genLinks,
 };
 
 (<any>window).settings = settings;
 (<any>window).keyring = keyring;
 (<any>window).account = account;
-
-export default settings;
+(<any>window).queryAccounts = async ()=>{
+  return JSON.stringify(await queryAccounts());
+};
+(<any>window).signFromAddressFunc = sign

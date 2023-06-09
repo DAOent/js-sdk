@@ -20,7 +20,7 @@ import { DispatchError } from "@polkadot/types/interfaces";
 import account from "./account";
 import gov from "./gov";
 
-let keyring = new Keyring({ ss58Format: 0, type: "sr25519" });
+let keyring = new Keyring({ ss58Format: 42, type: "sr25519" });
 
 /**
  * Generate a set of new mnemonic.
@@ -431,6 +431,7 @@ async function verifySignature(message: string, signature: string, address: stri
 }
 
 export default {
+  globlekeyring:keyring,
   initKeys,
   gen,
   checkMnemonicValid,
