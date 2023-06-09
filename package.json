@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "clean": "rm -f dist/*",
-    "prebuild": "rm -f ./assets/*.js",
-    "build": "yarn prebuild && yarn clean && webpack --mode production",
+    "build": "yarn clean && webpack --mode production",
     "build-dev": "webpack --watch --mode development"
   },
   "resolutions": {
