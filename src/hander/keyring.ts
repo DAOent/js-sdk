@@ -18,7 +18,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ITuple } from "@polkadot/types/types";
 import { DispatchError } from "@polkadot/types/interfaces";
 import account from "./account";
-import gov from "./gov";
+import gov from "../utils/gov";
 
 let keyring = new Keyring({ ss58Format: 42, type: "sr25519" });
 

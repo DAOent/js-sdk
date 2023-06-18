@@ -9,7 +9,7 @@ import { ApiPromise } from "@polkadot/api";
 import { subscribeMessage } from "./setting";
 import { web3Accounts, web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
 import keyring from "./keyring";
-import { hexToss58 } from "../utils/address";
+import { hexToss58, ss58ToHex } from "../utils/address";
 // let keyring = new Keyring({ ss58Format: 0, type: "sr25519" });
 
 /**
@@ -144,7 +144,7 @@ export async function queryAccounts() {
 
   const allAccounts = await web3Accounts();
   return allAccounts.map(v => {
-    v.address = u8aToHex(keyring.globlekeyring.decodeAddress(v.address));
+    v.address = ss58ToHex(v.address);
     return v;
   });
 }
@@ -154,7 +154,7 @@ export async function sign(address: string, ctx: string): Promise<string> {
   if (extensions.length === 0) {
     throw new Error('no extension');
   }
-  const SENDER = hexToss58(address);
+  const SENDER = hexToss58(address,undefined);
   const injector = await web3FromAddress(SENDER);
 
   const signRaw = injector.signer.signRaw;
