@@ -49,7 +49,7 @@ export class DAO {
       // 构建请求
       const result: any = await this.base.api!.query.weteeDAO.memberPoint(dao_id, hexToss58(member,undefined))
         ?? 0;
-      return parseInt(result.toString());
+      return parseInt(result.toString().replace(",",""));
     }
   
     // DAO 信息

@@ -10,10 +10,11 @@ export class Balance {
   
     async balance(address:string):Promise<any> {
         const res:any = await this.base.api!.query.system.account(hexToss58(address,undefined));
+        let item = res.toHuman();
         return {
-            "free": parseInt(res.data.free.toString()),
-            "frozen": parseInt(res.data.feeFrozen.toString()),
-            "reserved": parseInt(res.data.reserved.toString()),
+            "free": parseInt(item.data.free.replace(",","")),
+            "frozen": parseInt(item.data.feeFrozen.replace(",","")),
+            "reserved": parseInt(item.data.reserved.replace(",","")),
         }
     }
   }

@@ -21,7 +21,7 @@ export class Project {
         results.push({
             "id": item.id,
             "name": hexToString(item.name),
-            "daoAccountId": item.daoAccountId,
+            "daoAccountId": ss58ToHex(item.daoAccountId),
             "description": hexToString(item.description),
             "creator": ss58ToHex(item.creator),
             "status": item.status=="Active"?1:0,
@@ -53,20 +53,20 @@ export class Project {
             id: parseInt(item.id),
             name: item.name,
             description: item.description,
-            point: parseInt(item.point),
-            priority: parseInt(item.priority),
-            projectId: parseInt(item.projectId),
-            creator: item.creator,
+            point: parseInt(item.point.replace(",","")),
+            priority: parseInt(item.priority.replace(",","")),
+            projectId: parseInt(item.projectId.replace(",","")),
+            creator: ss58ToHex(item.creator),
             rewards: item.rewards.map((v:any)=>{
                 let jv = {
-                    "assetId": parseInt(v[0]),
-                    "amount": parseInt(v[1])
+                    "assetId": parseInt(v[0].replace(",","")),
+                    "amount": parseInt(v[1].replace(",",""))
                 }
                 return jv
             }),
-            maxAssignee: parseInt(item.maxAssignee),
-            assignees: item.assignees,
-            reviewers: item.reviewers,
+            maxAssignee: parseInt(item.maxAssignee.replace(",","")),
+            assignees: item.assignees.map((v:any)=>ss58ToHex(v)),
+            reviewers: item.reviewers.map((v:any)=>ss58ToHex(v)),
             skills: transSkills,
             status: taskStatusMap[item.status],
           })

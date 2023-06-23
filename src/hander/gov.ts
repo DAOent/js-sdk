@@ -67,14 +67,14 @@ export class Gov {
           "hash": "",
           "memberGroup": {
             "scope": item.memberData=="GLOBAL"?1:member_group_map[keys[0].toLocaleLowerCase()],
-            "id": keys[0].toLocaleLowerCase()=="global" ? 0 : parseInt(item.memberData[keys[0]])
+            "id": keys[0].toLocaleLowerCase()=="global" ? 0 : parseInt(item.memberData[keys[0]].replace(",",""))
           },
           // "account": ss58ToHex(item[4]),
           "end": parseInt(item.end.replace(",","")) ,
           "proposal": "",
           "tally": {
-            "yes": parseInt(item.tally.yes),
-            "no": parseInt(item.tally.no),
+            "yes": parseInt(item.tally.yes.replace(",","")),
+            "no": parseInt(item.tally.no.replace(",","")),
           },
           "status": referendumStatusMap[item.status]
         })
@@ -91,12 +91,12 @@ export class Gov {
       datas.forEach((data) => {
         let item = data.toHuman();
         results.push({
-          "daoId": parseInt(item.daoId),
-          "pledge": parseInt(item.pledge.FungToken),
+          "daoId": parseInt(item.daoId.replace(",","")),
+          "pledge": parseInt(item.pledge.FungToken.replace(",","")),
           "opinion": voteOpinionMap[item.opinion],
-          "voteWeight": parseInt(item.voteWeight),
+          "voteWeight": parseInt(item.voteWeight.replace(",","")),
           "unlockBlock": parseInt(item.unlockBlock.replace(",","")),
-          "referendumIndex": parseInt(item.referendumIndex),
+          "referendumIndex": parseInt(item.referendumIndex.replace(",","")),
         })
       });
       return results;

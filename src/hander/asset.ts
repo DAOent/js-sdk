@@ -12,9 +12,9 @@ export class Asset {
         const res:any = await this.base.api!.query.tokens.accounts(hexToss58(address,undefined),dao_id);
         let item = res.toHuman();
         return {
-            "free": parseInt(res.free),
-            "frozen": parseInt(res.frozen),
-            "reserved": parseInt(res.reserved),
+            "free": parseInt(item.free.replace(",","")),
+            "frozen": parseInt(item.frozen.replace(",","")),
+            "reserved": parseInt(item.reserved.replace(",","")),
         }
     }
   }
