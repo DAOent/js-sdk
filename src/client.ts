@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
 
-export let clientMap: Map<number, Client> = new Map<number, Client>();
+export let clientMap:Client[] = [];
 
 export class Client {
     index: number;
@@ -11,25 +11,26 @@ export class Client {
     constructor(_url: string[]) {
         console.log('Client constructor');
         this.url = _url;
-        this.index = clientMap.keys.length;
-        clientMap.set(clientMap.keys.length, this);
+        this.index = clientMap.length;
+        clientMap.push(this);
     }
 
-    static from_index(i: number):Client {
-        let c = clientMap.get(i);
-        if(c==undefined){
+    static from_index(i: number): Client {
+        let c = clientMap[i];
+        if (c == undefined) {
             throw "client is not start";
         }
         return c!;
     }
 
     async start() {
+        console.log('Client start '+this.url);
         const wsProvider = new WsProvider(this.url);
         try {
             this.api = await ApiPromise.create({
                 provider: wsProvider,
-                types:{
-                    "MemmberData":{
+                types: {
+                    "MemmberData": {
                         _enum: {
                             GLOBAL: null,
                             GUILD: 'u64',
@@ -41,7 +42,7 @@ export class Client {
                             "FungToken": 'u128',
                         }
                     },
-                    "Opinion":{
+                    "Opinion": {
                         _enum: [
                             "YES",
                             "NO",
@@ -53,17 +54,24 @@ export class Client {
             throw `connect failed`;
         }
     }
-    
-    weteeGovCall(daoId:number, ext:any, call:any ):any {
-       let ps:any = {}
-       ps[MemmberDataMap[ext.member.scope]] = ext.member.scope==1?null:ext.member.id;
-       let memmberData = this.api!.createType("MemmberData",ps)
-       return this.api!.tx.weteeGov.createPropose(daoId,memmberData,call,ext.amount)
+
+    async stop() {
+        if (this.api != undefined) {
+           await this.api.disconnect();
+        }
+        this.api = undefined;
+    }
+
+    weteeGovCall(daoId: number, ext: any, call: any): any {
+        let ps: any = {}
+        ps[MemmberDataMap[ext.member.scope]] = ext.member.scope == 1 ? null : ext.member.id;
+        let memmberData = this.api!.createType("MemmberData", ps)
+        return this.api!.tx.weteeGov.createPropose(daoId, memmberData, call, ext.amount)
     }
 }
 
-const MemmberDataMap:any={
-    1:"GLOBAL",
-    2:"GUILD",
-    3:"PROJECT",
+const MemmberDataMap: any = {
+    1: "GLOBAL",
+    2: "GUILD",
+    3: "PROJECT",
 }

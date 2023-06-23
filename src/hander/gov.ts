@@ -15,6 +15,11 @@ const referendumStatusMap:any = {
   "Rejected": 2,
 }
 
+const voteOpinionMap:any = {
+  "YES": 1,
+  "NO": 0,
+}
+
 export class Gov {
     public base: Client;
   
@@ -65,7 +70,7 @@ export class Gov {
             "id": keys[0].toLocaleLowerCase()=="global" ? 0 : parseInt(item.memberData[keys[0]])
           },
           // "account": ss58ToHex(item[4]),
-          "end": parseInt(item.end) ,
+          "end": parseInt(item.end.replace(",","")) ,
           "proposal": "",
           "tally": {
             "yes": parseInt(item.tally.yes),
@@ -83,12 +88,15 @@ export class Gov {
       
       let results: any[] = [];
       // @ts-ignore
-      datas.forEach(([key, data]) => {
+      datas.forEach((data) => {
         let item = data.toHuman();
-        console.log(item)
         results.push({
-          "id": parseInt(item.id),
-          
+          "daoId": parseInt(item.daoId),
+          "pledge": parseInt(item.pledge.FungToken),
+          "opinion": voteOpinionMap[item.opinion],
+          "voteWeight": parseInt(item.voteWeight),
+          "unlockBlock": parseInt(item.unlockBlock.replace(",","")),
+          "referendumIndex": parseInt(item.referendumIndex),
         })
       });
       return results;
