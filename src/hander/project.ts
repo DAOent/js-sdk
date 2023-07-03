@@ -1,7 +1,8 @@
 import { web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
-import { hexToU8a, u8aToString, hexToString } from "@polkadot/util";
+import { hexToU8a, u8aToString } from "@polkadot/util";
 import { Client } from "../client";
 import { hexToss58, ss58ToHex } from "../utils/address";
+import { tryHexToString } from "../utils/trans";
 
 export class Project {
     public base: Client;
@@ -20,9 +21,9 @@ export class Project {
         let item = JSON.parse(JSON.stringify(datas[i]));
         results.push({
             "id": item.id,
-            "name": hexToString(item.name),
+            "name": tryHexToString(item.name),
             "daoAccountId": ss58ToHex(item.daoAccountId),
-            "description": hexToString(item.description),
+            "description": tryHexToString(item.description),
             "creator": ss58ToHex(item.creator),
             "status": item.status=="Active"?1:0,
         })
@@ -33,7 +34,7 @@ export class Project {
     // DAO 成员列表
     public async member_list(dao_id: number,project_id:number): Promise<any[]> {
       // 构建请求
-      const result: any = await this.base.api!.query.weteeDAO.projectMembers(dao_id,project_id) ?? [];
+      const result: any = await this.base.api!.query.weteeOrg.projectMembers(dao_id,project_id) ?? [];
       return result.toHuman().map((v:string)=>ss58ToHex(v));
     }
 

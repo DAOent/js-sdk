@@ -1,5 +1,5 @@
 import { web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
-import { hexToU8a, u8aToString, hexToString } from "@polkadot/util";
+import { hexToU8a, u8aToString } from "@polkadot/util";
 import { Client } from "../client";
 import { hexToss58, ss58ToHex } from "../utils/address";
 

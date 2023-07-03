@@ -534,6 +534,96 @@ import { Asset } from "./hander/asset";
   )
 }
 
+(<any>window).orgs = async (
+  client: number,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new DAO(c);
+  let data = await dao.daos()
+  return JSON.stringify(data);
+}
+
+
+(<any>window).create_dao = async (
+  client: number,
+  from: string,
+  name: string,
+  purpose: string,
+  metaData: string,
+  desc: string,
+  imApi: string,
+  bg: string,
+  logo: string,
+  img: string,
+  homeUrl: string,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new DAO(c);
+  return await dao.create_dao(
+    from,
+    name,
+    purpose,
+    metaData,
+    desc,
+    imApi,
+    bg,
+    logo,
+    img,
+    homeUrl,
+  )
+}
+
+(<any>window).appHubs = async (
+  client: number,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new DAO(c);
+  let data = await dao.appHubs()
+  return JSON.stringify(data);
+}
+
+(<any>window).orgApps = async (
+  client: number,
+  orgId: number
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new DAO(c);
+  let data = await dao.orgApps(orgId)
+  return JSON.stringify(data);
+}
+
+(<any>window).orgIntegrateApp = async (
+  client: number,
+  from: string,
+  orgId: number,
+  appId: number,
+  ext: any,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new DAO(c);
+  return await dao.org_integrate_app(
+    from,
+    orgId,
+    appId,
+    ext,
+  )
+}
+
 // daoProjectJoinRequestWithRootFunc
 
 // daoApplyProjectFundsFunc
