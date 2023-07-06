@@ -40,7 +40,7 @@ export class Gov {
         results.push({
           "index": item[0],
           "hash": item[1],
-          "runtimeCall": itemh[2].section+"/"+itemh[2].method,
+          "runtimeCall": JSON.parse(itemh[2]),
           "memberGroup": {
             "scope": member_group_map[keys[0]],
             "id": keys[0]=="global" ? 0 : item[3][keys[0]]
@@ -61,6 +61,7 @@ export class Gov {
       datas.forEach(([key, data]) => {
         let item = data.toHuman();
         let keys = item.memberData=="GLOBAL"?["GLOBAL"]:Object.keys(item.memberData) ;
+        console.log(item)
         results.push({
           "id": parseInt(item.id),
           "delay": parseInt(item.delay.replace(",","")),
@@ -71,7 +72,7 @@ export class Gov {
           },
           // "account": ss58ToHex(item[4]),
           "end": parseInt(item.end.replace(",","")) ,
-          "proposal": "",
+          "proposal": JSON.stringify(item.proposal),
           "tally": {
             "yes": parseInt(item.tally.yes.replace(",","")),
             "no": parseInt(item.tally.no.replace(",","")),

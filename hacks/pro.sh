@@ -20,4 +20,4 @@ fi
 
 npm run build
 
-ossutil64 -c ./hacks/.config -f --recursive cp dist/ oss://wetee
+ossutil64 -c ./hacks/.config -f --recursive cp dist/ oss://wetee-dtim
