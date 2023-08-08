@@ -1,7 +1,8 @@
 import { web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
-import { hexToU8a, u8aToString, hexToString } from "@polkadot/util";
+import { hexToU8a, u8aToString } from "@polkadot/util";
 import { Client } from "../client";
 import { hexToss58, ss58ToHex } from "../utils/address";
+import { tryHexToString } from "../utils/trans";
 
 export class Guild {
     public base: Client;
@@ -20,9 +21,9 @@ export class Guild {
         let item = JSON.parse(JSON.stringify(datas[i]));
         results.push({
             "id": item.id,
-            "name": hexToString(item.name),
-            "desc": hexToString(item.desc),
-            "metaData": hexToString(item.metaData),
+            "name": tryHexToString(item.name),
+            "desc": tryHexToString(item.desc),
+            "metaData": tryHexToString(item.metaData),
             "daoAccountId": item.daoAccountId,
             "startBlock": item.startBlock,
             "creator": ss58ToHex(item.creator),

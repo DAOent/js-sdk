@@ -10,3 +10,4 @@
 *.log
 hacks/.config
 dist/
+ossutil_output/
