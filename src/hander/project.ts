@@ -33,7 +33,7 @@ export class Project {
     // DAO 成员列表
     public async member_list(dao_id: number,project_id:number): Promise<any[]> {
       // 构建请求
-      const result: any = await this.base.api!.query.weteeDAO.projectMembers(dao_id,project_id) ?? [];
+      const result: any = await this.base.api!.query.weteeOrg.projectMembers(dao_id,project_id) ?? [];
       return result.toHuman().map((v:string)=>ss58ToHex(v));
     }
 

@@ -51,6 +51,16 @@ import { Guild } from "./hander/guild";
   return JSON.stringify(data);
 }
 
+(<any>window).orgs = async (client_index: number,daoid: number) => {
+  let client = Client.from_index(client_index);
+  if(client.api==null){
+    throw "client is not start"
+  }
+  let balance =  new DAO(client);
+  let data =  await balance.dao_info(daoid);
+  return JSON.stringify(data);
+}
+
 (<any>window).daoInfo = async (client_index: number,daoid: number) => {
   let client = Client.from_index(client_index);
   if(client.api==null){

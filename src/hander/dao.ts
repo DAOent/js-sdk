@@ -13,7 +13,7 @@ export class DAO {
     // 下一个 DAO ID
     public async next_dao_id(): Promise<number> {
       // 构建请求
-      const result: any = await this.base.api!.query.WeteeDAO.next_dao_id()?? 5000;
+      const result: any = await this.base.api!.query.weteeOrg.next_dao_id()?? 5000;
       return result;
     }
   
@@ -25,7 +25,7 @@ export class DAO {
       meta_data: string
     ): Promise<void> {
       const injector = await web3FromAddress(hexToss58(from,undefined));
-      await this.base.api!.tx.weteeDAO.createDao(
+      await this.base.api!.tx.weteeOrg.createDao(
         name,
         purpose,
         meta_data
@@ -37,7 +37,7 @@ export class DAO {
     // DAO 成员列表
     public async member_list(dao_id: number): Promise<string[]> {
       // 构建请求
-      const result: any = await this.base.api!.query.weteeDAO.members(dao_id) ?? [];
+      const result: any = await this.base.api!.query.weteeOrg.members(dao_id) ?? [];
       return result.toHuman().map((v:string)=>ss58ToHex(v));
     }
   
@@ -47,7 +47,7 @@ export class DAO {
       member: string
     ): Promise<number> {
       // 构建请求
-      const result: any = await this.base.api!.query.weteeDAO.memberPoint(dao_id, hexToss58(member,undefined))
+      const result: any = await this.base.api!.query.weteeOrg.memberPoint(dao_id, hexToss58(member,undefined))
         ?? 0;
       return parseInt(result.toString());
     }
@@ -57,7 +57,8 @@ export class DAO {
       dao_id: number 
     ): Promise<any> {
       // 构建请求
-      let result:any = await this.base.api!.query.weteeDAO.daos(dao_id);
+      let result:any = await this.base.api!.query.weteeOrg.daos(dao_id);
+      console.log(result.toHuman())
       let data = JSON.parse(JSON.stringify(result));
       data.creator = ss58ToHex(data.creator)
       data.daoAccountId = ss58ToHex(data.daoAccountId)
@@ -111,7 +112,7 @@ export class DAO {
     ):Promise<any[]>{
         let results: any[] = [];
         for (let quarter = 1;quarter< 5;quarter++) {
-          let tasks: any = await this.base.api!.query.weteeDAO.roadMaps(dao_id,year * 100 + quarter);
+          let tasks: any = await this.base.api!.query.weteeOrg.roadMaps(dao_id,year * 100 + quarter);
           results.push({
               "year":year,
               "quarter":quarter,

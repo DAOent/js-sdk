@@ -13,7 +13,7 @@ export class Guild {
     // DAO 成员列表
     public async guild_list(dao_id: number): Promise<any[]> {
       // 构建请求
-      const datas: any = await this.base.api!.query.weteeDAO.guilds(dao_id) ?? [];
+      const datas: any = await this.base.api!.query.weteeOrg.guilds(dao_id) ?? [];
       let results: any[] = [];
 
       for(let i=0;i<datas.length;i++){
@@ -35,7 +35,7 @@ export class Guild {
     // DAO 成员列表
     public async member_list(dao_id: number,project_id:number): Promise<string[]> {
       // 构建请求
-      const result: any = await this.base.api!.query.weteeDAO.guildMembers(dao_id,project_id) ?? [];
+      const result: any = await this.base.api!.query.weteeOrg.guildMembers(dao_id,project_id) ?? [];
       return result.toHuman().map((v:string)=>ss58ToHex(v));
     }
 
