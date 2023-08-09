@@ -63,10 +63,13 @@ export class Client {
     }
 
     weteeGovCall(daoId: number, ext: any, call: any): any {
+        if(ext.runType==2){
+            return this.api!.tx.weteeSudo.sudo(daoId,call);
+        }
         let ps: any = {}
         ps[MemmberDataMap[ext.member.scope]] = ext.member.scope == 1 ? null : ext.member.id;
         let memmberData = this.api!.createType("MemmberData", ps)
-        return this.api!.tx.weteeGov.createPropose(daoId, memmberData, call, ext.amount)
+        return this.api!.tx.weteeGov.createPropose(daoId, memmberData, call, ext.periodIndex)
     }
 }
 

@@ -7,6 +7,7 @@ import { Gov } from "./hander/gov";
 import { Project } from "./hander/project";
 import { Guild } from "./hander/guild";
 import { Asset } from "./hander/asset";
+import { Treasury } from "./hander/treasury";
 
 (<any>window).queryAccounts = async () => {
   return JSON.stringify(await queryAccounts());
@@ -54,16 +55,6 @@ import { Asset } from "./hander/asset";
   }
   let balance = new Balance(client);
   let data = await balance.balance(address);
-  return JSON.stringify(data);
-}
-
-(<any>window).orgs = async (client_index: number,daoid: number) => {
-  let client = Client.from_index(client_index);
-  if(client.api==null){
-    throw "client is not start"
-  }
-  let balance =  new DAO(client);
-  let data =  await balance.dao_info(daoid);
   return JSON.stringify(data);
 }
 
@@ -261,14 +252,14 @@ import { Asset } from "./hander/asset";
 }
 
 (<any>window).daoGovStartReferendum = async (
-  from: string, client: number, daoId: number, index: number
+  from: string, client: number, daoId: number, index: number, deposit: number,
 ) => {
   let c = Client.from_index(client);
   if (c.api == null) {
     throw "client is not start"
   }
   let gov = new Gov(c);
-  let data = await gov.start_referendum(from, daoId, index);
+  let data = await gov.start_referendum(from, daoId, index, deposit);
   return data;
 }
 
@@ -631,6 +622,73 @@ import { Asset } from "./hander/asset";
     orgId,
     appId,
     ext,
+  )
+}
+
+
+(<any>window).daoTreasuryProposals = async (
+  client: number,
+  orgId: number
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new Treasury(c);
+  let data = await dao.proposals(orgId)
+  return JSON.stringify(data);
+}
+
+(<any>window).daoGovPeriods = async (
+  client: number,
+  orgId: number
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let gov = new Gov(c);
+  let data = await gov.periods(orgId)
+  return JSON.stringify(data);
+}
+
+(<any>window).createTreasuryProposal = async (
+  from: string,
+  client: number,
+  daoId: number,
+  beneficiary: string,
+  value: number,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new Treasury(c);
+  return await dao.createTreasuryProposal(
+    from,
+    daoId,
+    beneficiary,
+    value,
+  )
+}
+
+(<any>window).govProposal = async (
+  from: string,
+  client: number,
+  daoId: number,
+  proposalId: number,
+  ext: any,
+) => {
+  let c = Client.from_index(client);
+  if (c.api == null) {
+    throw "client is not start"
+  }
+  let dao = new Treasury(c);
+  return await dao.gov_proposal(
+    from,
+    daoId,
+    proposalId,
+    ext
   )
 }
 

@@ -78,7 +78,7 @@ export class Guild {
           console.log(error)
           no("transaction failed', "+error.toString())
         });
-      })     
+    })
   }
 
 

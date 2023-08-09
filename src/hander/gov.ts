@@ -2,11 +2,12 @@ import { web3Enable, web3FromAddress } from "@polkadot/extension-dapp";
 import { hexToU8a, u8aToString } from "@polkadot/util";
 import { Client } from "../client";
 import { hexToss58, ss58ToHex } from "../utils/address";
+import { strToInt, tryHexToString } from "../utils/trans";
 
 const member_group_map:any = {
-  "global": 1,
-  "guild": 2,
-  "project": 3,
+  "GLOBAL": 1,
+  "GUILD": 2,
+  "PROJECT": 3,
 }
 
 const referendumStatusMap:any = {
@@ -34,21 +35,32 @@ export class Gov {
       
       let results: any[] = [];
       for(let i=0;i<datas.length;i++){
-        let itemh = datas[i].toHuman();
-        let item = JSON.parse(JSON.stringify(datas[i]));
-        let keys = Object.keys(item[3]);
+        let item = datas[i].toHuman();
+        let keys = typeof(item[3])=='string'?["GLOBAL"]:Object.keys(item[3]);
+        
+        console.log(item)
         results.push({
-          "index": item[0],
+          "index": strToInt(item[0]),
           "hash": item[1],
-          "runtimeCall": JSON.parse(itemh[2]),
+          "runtimeCall": JSON.stringify(item[2]),
           "memberGroup": {
             "scope": member_group_map[keys[0]],
-            "id": keys[0]=="global" ? 0 : item[3][keys[0]]
+            "id": keys[0]=="GLOBAL" ? 0 : strToInt(item[3][keys[0]])
           },
           "account": ss58ToHex(item[4]),
+          "period": {
+            "name": item[5]["name"],
+            "preparePeriod": strToInt(item[5]["preparePeriod"]),
+            "maxDeciding": strToInt(item[5]["maxDeciding"]),
+            "confirmPeriod": strToInt(item[5]["confirmPeriod"]),
+            "decisionPeriod": strToInt(item[5]["decisionPeriod"]),
+            "minEnactmentPeriod": strToInt(item[5]["minEnactmentPeriod"]),
+            "decisionDeposit": strToInt(item[5]["decisionDeposit"]),
+            "minApproval": strToInt(item[5]["minApproval"]),
+            "minSupport": strToInt(item[5]["minSupport"]),
+          },
         })
       }
-      // console.log(JSON.parse(JSON.stringify(results)))
       return results;
     }
 
@@ -64,20 +76,31 @@ export class Gov {
         console.log(item)
         results.push({
           "id": parseInt(item.id),
-          "delay": parseInt(item.delay.replace(",","")),
+          "delay": 0,
           "hash": "",
           "memberGroup": {
             "scope": item.memberData=="GLOBAL"?1:member_group_map[keys[0].toLocaleLowerCase()],
             "id": keys[0].toLocaleLowerCase()=="global" ? 0 : parseInt(item.memberData[keys[0]].replace(",",""))
           },
           // "account": ss58ToHex(item[4]),
-          "end": parseInt(item.end.replace(",","")) ,
+          "end": 0,
           "proposal": JSON.stringify(item.proposal),
           "tally": {
             "yes": parseInt(item.tally.yes.replace(",","")),
             "no": parseInt(item.tally.no.replace(",","")),
           },
-          "status": referendumStatusMap[item.status]
+          "status": referendumStatusMap[item.status],
+          "period": {
+            "name": item["period"]["name"],
+            "preparePeriod": strToInt(item["period"]["preparePeriod"]),
+            "maxDeciding": strToInt(item["period"]["maxDeciding"]),
+            "confirmPeriod": strToInt(item["period"]["confirmPeriod"]),
+            "decisionPeriod": strToInt(item["period"]["decisionPeriod"]),
+            "minEnactmentPeriod": strToInt(item["period"]["minEnactmentPeriod"]),
+            "decisionDeposit": strToInt(item["period"]["decisionDeposit"]),
+            "minApproval": strToInt(item["period"]["minApproval"]),
+            "minSupport": strToInt(item["period"]["minSupport"]),
+          },
         })
       });
       return results;
@@ -107,6 +130,7 @@ export class Gov {
       from: string,
       dao_id: number,
       id: number,
+      eposit: number,
     ): Promise<boolean> {
       const extensions = await web3Enable('DTIM');
       if (extensions.length === 0) {
@@ -116,7 +140,8 @@ export class Gov {
       return new Promise<boolean>((ok,no)=>{
         this.base.api!.tx.weteeGov.startReferendum(
           dao_id,
-          id
+          id,
+          eposit
         ).signAndSend(hexToss58(from,undefined), { signer: injector.signer }, ({events = [],status}) => {
           if (status.isInBlock) {
             events.forEach(({ event: { data, method, section }, phase }) => {
@@ -200,5 +225,25 @@ export class Gov {
           no("transaction failed', "+error.toString())
         });
       })
+    }
+
+    public async periods(orgId:number): Promise<any[]> {
+      // 构建请求
+      const datas: any = await this.base.api!.query.weteeGov.periods(orgId) ?? [];
+      console.log(datas.toHuman())
+      let items = datas.toHuman().map((v:any)=>{
+        return {
+          "name": tryHexToString(v.name),
+          "preparePeriod": strToInt(v.preparePeriod),
+          "maxDeciding": strToInt(v.maxDeciding),
+          "confirmPeriod": strToInt(v.confirmPeriod),
+          "decisionPeriod": strToInt(v.decisionPeriod),
+          "minEnactmentPeriod": strToInt(v.minEnactmentPeriod),
+          "decisionDeposit": strToInt(v.decisionDeposit),
+          "minApproval": strToInt(v.minApproval),
+          "minSupport": strToInt(v.minSupport),
+        }
+      })
+      return items;
     }
 }

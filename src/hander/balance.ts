@@ -12,9 +12,9 @@ export class Balance {
         const res:any = await this.base.api!.query.system.account(hexToss58(address,undefined));
         let item = res.toHuman();
         return {
-            "free": parseInt(item.data.free.replace(",","")),
-            "frozen": parseInt(item.data.feeFrozen.replace(",","")),
-            "reserved": parseInt(item.data.reserved.replace(",","")),
+            "free": parseInt(item.data.free.replace(",",""))*1_000_000_000_000,
+            "frozen": parseInt(item.data.frozen.replace(",",""))*1_000_000_000_000,
+            "reserved": parseInt(item.data.reserved.replace(",",""))*1_000_000_000_000,
         }
     }
   }

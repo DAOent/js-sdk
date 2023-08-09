@@ -1,5 +1,5 @@
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { hexToU8a, u8aToHex, tryHexToString, u8aWrapBytes } from "@polkadot/util";
+import { hexToU8a, u8aToHex, hexToString, u8aWrapBytes } from "@polkadot/util";
 // @ts-ignore
 import { ss58Decode } from "oo7-substrate/src/ss58";
 import { polkadotIcon } from "@polkadot/ui-shared";
@@ -110,7 +110,7 @@ async function getBalance(api: ApiPromise, address: string, msgChannel: string) 
     const lockedBreakdown = res.lockedBreakdown.map((i: any) => {
       return {
         ...i.toJSON(),
-        use: tryHexToString(i.id.toHex()),
+        use: hexToString(i.id.toHex()),
       };
     });
     return {

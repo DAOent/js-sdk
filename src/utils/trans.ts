@@ -6,3 +6,7 @@ export function tryHexToString(str: string) {
     }
     return hexToString(str)
 }
+
+export function strToInt(str: string) {
+    return parseInt(str.replace(",",""))
+}
